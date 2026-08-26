@@ -1,13 +1,15 @@
 # Memory Index
 
-> Auto-maintained by the project-memory skill. One line per session.
+> Historical retrieval index maintained by project-memory v2. One line per meaningful development episode.
 
-## Sessions
+## Episodes
 
-<!-- Format: - `sessions/<filename>.md` — <one-line summary> [`tags: #tag1 #tag2`] -->
+<!-- Format:
+- `episodes/YYYYMMDD-HHmm-short-slug.md` — one-line historical outcome [`tags: #decision #auth`] [`files: src/auth/...`]
+-->
 
-## Notes
+## Retrieval Notes
 
-- Newest entries at the bottom
-- When session count exceeds 20, oldest entries should be archived into knowledge.md
-- Tags help with future retrieval — use them liberally (`#auth`, `#ui`, `#refactor`, `#bug`, `#decision`, `#vibe-coding`)
+- Prefer topic/file/tag relevance over pure recency.
+- Read only 1-3 episodes for normal recall.
+- This index does not describe current project status.

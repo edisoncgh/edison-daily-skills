@@ -1,210 +1,151 @@
 ---
 name: project-memory
-description: "Maintain persistent project-level memory across sessions by reading and writing markdown files in the .memory directory. Use when: starting a new project, continuing work after a break, user says 'remember this', 'what did we do about X', 'vibe coding', 'keep track', 'don't forget', 'project context', 'what was the decision on...', or any multi-turn development work. Triggers: project-memory, vibe coding, remember, memory, context, continuity."
+description: Use when recalling why past project decisions were made, preserving a meaningful development episode or reusable lesson, migrating legacy project memory, or when a continuity workflow such as project-continue requests historical recall or persistence.
 ---
 
-# Project Memory Skill
+# Project Memory
 
-You have access to a **project-level persistent memory system** stored in the `.memory/` directory at the project root. This skill ensures continuity across sessions — especially critical for **vibe coding** workflows where development happens over many turns and breaks.
+Project Memory is the project's **historical continuity layer**. It answers:
 
-## Memory Directory Layout
+> **How did this project get here?**
 
-```
+It preserves meaningful development episodes, decision rationale, failed approaches,
+fixes, environment quirks, and lessons that are not obvious from current code.
+
+**Boundary:** historical continuity, not current state.
+
+| Question | Owner |
+|---|---|
+| What happened before, and why? | `project-memory` |
+| What failed/worked before? | `project-memory` |
+| What are we doing now / next? | Handoff docs + verified code/runtime |
+| What is the current architecture? | Current technical docs + code |
+| Are knowledge surfaces consistent? | `neat-freak` or equivalent auditor |
+
+If history conflicts with present-day docs, do not rewrite history to match. Memory
+explains the past; current operational surfaces describe the present.
+
+## Layout
+
+```text
 .memory/
-├── context.md                # MANDATORY — current working snapshot (volatile, rewrite on each update)
-├── index.md                  # Memory index — lists all session files with one-line summaries + tags
-├── knowledge.md              # Long-term knowledge — architecture, user preferences, conventions, decisions
-└── sessions/
-    ├── 20260209-143022.md    # One file per conversation turn
-    ├── 20260210-091500.md
-    └── ...
+├── index.md
+├── knowledge.md
+└── episodes/
+    └── YYYYMMDD-HHmm-short-event.md
 ```
 
-`context.md` is **mandatory**. If `.memory/` exists but `context.md` is missing or empty, treat it as a broken memory state and repair immediately (see "Repair Existing Memory" below).
+There is deliberately **no `.memory/context.md`** in v2.
 
-## When to Use This Skill
+- `index.md`: retrieval map, one concise line per meaningful episode.
+- `knowledge.md`: distilled historical rationale, lessons, pitfalls, transitions.
+- `episodes/`: event-oriented history, not one file per chat turn.
 
-**ALWAYS activate at session start if `.memory/` exists.**
+## Recall
 
-Also activate when user mentions:
-- "remember this", "keep track of", "don't forget"
-- "what did we do about X", "what was the decision on..."
-- "vibe coding", "continue where we left off"
-- Any multi-file, multi-turn development task
-- Any modification, development, operation or work finished
+When `.memory/` exists or the user asks about prior work:
 
----
+1. Read `index.md` and `knowledge.md`.
+2. Infer the relevant topic from the request/current handoff.
+3. Read only **1-3 relevant episodes**, ranked by topic, file path, tags, then recency.
+4. Recover relevant decisions, rationale, failed attempts, fixes, and pitfalls.
+5. If the user needs current status or next action, continue to handoff docs and/or
+   verify code/runtime. Never infer current state from an old episode.
 
-## Workflow A — Session Start (MUST follow when .memory/ exists)
+## Persist Only Meaningful Events
 
-### Phase 1 — Recall
+Create an episode when the work produced historical value, such as:
 
-1. **Read** `.memory/index.md`
-   - If missing: `.memory/` not initialized → skip to Workflow C
-2. **Read** `.memory/context.md` for active working state
-   - If missing or empty: **repair immediately** — do not skip. See "Repair Existing Memory" below.
-   - If stale (e.g., Status is ACTIVE but last update was > 7 days ago, or content contradicts `docs/TASKS.md` / `docs/AGENT_HANDOFF.md`): refresh after reading index, knowledge, and recent sessions.
-3. **Read** `.memory/knowledge.md` for long-term context
-4. **Query relevant sessions** (see Session Query Strategy below)
-   - Read no more than 3 session files at a time
-   - Prioritize: most recent + tags matching current topic
-5. **Summarize recalled context** in 2-3 sentences (internal reasoning)
+- a meaningful slice/milestone outcome;
+- a decision or reversal with rationale;
+- a non-obvious bug diagnosis/fix;
+- a failed approach future agents could repeat;
+- an environment/toolchain quirk;
+- a requirement/user choice that changed project trajectory;
+- a handoff containing new historical lessons.
 
-### Phase 2 — Respond with Memory
+Skip memory for routine inspection, trivial edits, raw tool output, chat narration,
+and "what we will do next".
 
-- Use recalled memory to avoid redundant questions
-- Reference specific past decisions: "As we decided on 2026-02-09, we use the adapter pattern..."
-- Check `.memory/context.md` open items — proactively offer to continue
+### Episode write flow
 
-### Phase 3 — Persist (after each turn)
+1. Read `template/episode.md`.
+2. Create `episodes/<date-time>-<slug>.md`.
+3. Record evidence-backed past-tense context, attempts/options, decision/change,
+   outcome/evidence, lessons/pitfalls, and any **unresolved-at-the-time** items.
+4. Reference paths/commits instead of copying code or diffs.
+5. Update `index.md`.
+6. Distill reusable historical understanding into `knowledge.md` when warranted.
+7. Do not write the current milestone, blocker, verification checklist, or next
+   action as if memory owns them.
 
-1. **Create** `.memory/sessions/<YYYYMMDD-HHmmss>.md` using `template/session.md`
-2. **Update** `.memory/index.md` — append entry with tags
-3. **Update** `.memory/knowledge.md** — if lasting insight gained
-4. **Update** `.memory/context.md` — **MANDATORY** at every meaningful development step:
-   - Rewrite the file (do not append). Use `template/context.md` as structure.
-   - Record: current goal, current slice, last known good state, active files, working state, blocker, next action, verification status, scope guardrails.
-   - If project uses `docs/TASKS.md` / `docs/AGENT_HANDOFF.md`, reference them by path — do not copy their content.
-   - Max 100 lines. If over, trim history and move durable facts to `knowledge.md`.
-5. **User checkpoint** — if significant decision made, ask: "Should I record this in long-term memory?"
+## Knowledge Distillation
 
----
+`knowledge.md` should contain historical understanding, for example:
 
-## Workflow B — Vibe Coding Mode (continuous development)
+- Historical Decisions & Rationale
+- Architecture / Product Transitions
+- Lessons Learned
+- Pitfalls & Failure Patterns
+- Environment / Toolchain Quirks
+- Project-Specific Preference History
 
-For extended coding sessions where user is iteratively building:
+If a memory fact becomes an active rule/current contract that every agent must obey,
+promote the authoritative statement to the rule/docs layer and keep only historical
+provenance in memory.
 
-### Every 3-5 turns OR at natural break points:
+## Project Continue Interface
 
-1. **Rewrite** `.memory/context.md` (use `template/context.md` structure):
-   - Current goal and slice
-   - Active files
-   - Working state (key functions/classes, not full code)
-   - Current blocker (if any)
-   - Next action
-   - Verification status
-   - Scope guardrails (Do Not Do)
+`project-continue` may use this skill as the historical layer, but Project Memory remains usable
+independently.
 
-2. **Tag the session** in index.md with `vibe-coding` tag
+- `project-continue resume` -> perform **Recall** for history relevant to the current work and
+  return decisions, prior attempts, transitions, pitfalls, and lessons.
+- `project-continue closeout` -> perform **Persist** only for meaningful new historical events;
+  distill reusable rationale/lessons and return a short persistence summary.
+- `project-continue checkpoint` -> persist only if the session created a genuinely meaningful
+  historical event.
+- `project-continue status` -> report whether the memory store is present/legacy/uncertain
+  without writing it.
 
-3. **If user says "break"/"pause"/"later"**:
-   - Write detailed context summary
-   - List all files modified in this session
-   - Note: "User paused work, will continue later"
+Never recursively invoke Project Continue. Never create a current-state snapshot or next-agent
+action list.
 
----
+## Legacy v1
 
-## Workflow C — First Time Initialization
+If `.memory/context.md` or `.memory/sessions/` exists, treat it as **legacy data**.
+Do not repair/refresh `context.md` or use it as current truth. Migrate durable history
+at a maintenance boundary without silently deleting unique history.
 
-When `.memory/` does NOT exist and user starts a project:
+Read `references/migration-v1-to-v2.md` before migration.
 
-1. **Ask user**: "Should I set up project memory to track our work?"
-2. If yes, create structure:
-   ```bash
-   .memory/
-   ├── context.md        (from template/context.md — NEVER create empty)
-   ├── index.md          (from template/index.md)
-   ├── knowledge.md      (from template/knowledge.md)
-   └── sessions/
-   ```
-3. **Seed context.md** with initial working state:
-   - Current goal (from user request or conversation)
-   - Current slice (if known)
-   - Active files (if any)
-   - Status (ACTIVE)
-4. **Seed knowledge.md** with initial project info:
-   - Tech stack (ask if unknown)
-   - User preferences (language, style)
-   - Project goals
+## Integration Contract
 
----
+With `handoff-driven-development`:
 
-## Repair Existing Memory
+- Memory owns **past tense**.
+- Handoff operational docs own **present direction/state**.
+- Current-state arbitration: **verified runtime/code -> handoff docs -> memory as
+  historical context**.
 
-When `.memory/` already exists but expected files are missing:
+With `neat-freak`, memory is an audited knowledge surface, not a second current-state
+source.
 
-1. **Do not recreate the entire memory directory.** Preserve existing `index.md`, `knowledge.md`, and `sessions/`.
-2. **Create only missing files** from templates:
-   - Missing `context.md` → create from `template/context.md`, then populate from recent sessions + project docs (`docs/TASKS.md`, `docs/AGENT_HANDOFF.md`, `docs/TECH_PLAN.md` if they exist).
-   - Missing `index.md` → rebuild by scanning `sessions/*.md` files.
-   - Missing `knowledge.md` → create from `template/knowledge.md`, seed from sessions if available.
-   - Missing `sessions/` → create empty directory.
-3. **After creating `context.md`**, populate it with:
-   - Most recent session's outcome and open items
-   - Current state from `docs/AGENT_HANDOFF.md` (if exists)
-   - Current slice from `docs/TASKS.md` (if exists)
-   - Status set to PAUSED (since we are recovering, not actively working)
-4. **Record the repair** in `index.md` as a note: `<!-- Memory repair: context.md recreated on YYYY-MM-DD -->`
-5. **Inform user**: "I noticed `context.md` was missing from project memory. I've created it based on recent sessions and project docs."
+## Non-Negotiable Rules
 
----
+Read `rules.md` for details. Never:
 
-## Session Query Strategy
+- store secrets/tokens/passwords;
+- dump full code/diffs;
+- create episode-per-turn logs;
+- own the current next step;
+- auto-delete unique history because it is old;
+- erase temporal contradictions that represent real project transitions.
 
-When user asks about past work, don't just read sequentially. Use these strategies:
+## Self-Check
 
-### 1. Tag-Based Search
-- Scan `.memory/index.md` for tags matching current topic
-- Tags to use: `#auth`, `#ui`, `#refactor`, `#bug`, `#decision`, `#vibe-coding`
-
-### 2. Temporal Search
-- "What did we do last time?" → read most recent 2-3 sessions
-- "What did we decide about X?" → search knowledge.md Decisions Log
-
-### 3. Keyword Search
-- Use Grep tool to search sessions for keywords
-- Example: `Grep(pattern: "JWT|auth", path: ".memory/sessions")`
-
-### 4. Relevance Ranking
-If too many sessions match, rank by:
-1. Exact keyword match in title/request
-2. Same file paths mentioned
-3. Recency (within last 7 days)
-4. Tagged with current topic
-
----
-
-## Memory Quality Rules
-
-See `rules.md` for:
-- File size limits and pruning
-- What to store vs. skip
-- Conflict handling
-- Privacy (no secrets)
-
-### Critical Additions:
-
-**Store in vibe coding:**
-- Current file being edited
-- Last working state before error
-- User's "try this" suggestions that worked
-- Environment issues and fixes
-
-**Skip in vibe coding:**
-- Full file contents (use relative paths)
-- Successful tool outputs that are reflected in file changes
-- Repetitive "looks good" exchanges
-
----
-
-## Templates & Examples
-
-- `template/` — structural templates (MUST follow format)
-- `examples/` — filled-in examples for reference:
-  - `examples/context-example.md` — example of a populated context.md snapshot
-  - `examples/session-example.md` — example of a session record
-  - `examples/knowledge-example.md` — example of accumulated knowledge
-
-**Before creating any memory file, read the corresponding template.**
-
----
-
-## Effectiveness Check (self-verification)
-
-After using memory for 3+ turns, verify:
-1. Did I avoid asking redundant questions?
-2. Did I reference past decisions correctly?
-3. Is `.memory/context.md` present, non-empty, and up-to-date with current working state?
-4. Does `context.md` stay under 100 lines?
-5. Does `context.md` reference `docs/TASKS.md` / `docs/AGENT_HANDOFF.md` by path rather than duplicating their content?
-6. If any answer is no — repair `context.md` immediately.
+- Did I answer history without treating it as current state?
+- Did I read only the relevant episodes?
+- Is each new episode a meaningful, evidence-backed event?
+- Did I route current milestone/blocker/next action to Handoff?
+- Did I avoid reviving legacy `context.md` semantics?

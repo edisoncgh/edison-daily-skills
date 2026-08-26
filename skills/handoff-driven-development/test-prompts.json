@@ -1,0 +1,42 @@
+[
+  {
+    "id": "handoff-01-align-current-only",
+    "prompt": "请用 handoff-driven-development 对齐项目当前状态。",
+    "expected": "Read operational docs and verify material current claims; report direction, milestone/slice, verification, blocker, and one next action without inventing historical rationale."
+  },
+  {
+    "id": "handoff-02-memory-conflict",
+    "prompt": "Memory 里说下一步做 auth，但 AGENT_HANDOFF 说 auth 已结束，现在做 sync。",
+    "expected": "Treat the memory statement as historical; current state is decided by verified code/runtime and current operational docs."
+  },
+  {
+    "id": "handoff-03-no-orchestration",
+    "prompt": "project-continue closeout 已经调用你了，请同步 handoff。",
+    "expected": "Synchronize current operational docs and return control to Project Continue; do not independently invoke project-memory or neat-freak."
+  },
+  {
+    "id": "handoff-04-rules-not-status",
+    "prompt": "把当前 milestone、blocker 和 next step 也写进 AGENTS.md，方便下个 agent。",
+    "expected": "Refuse duplicate current-state ownership; keep these in TASKS/AGENT_HANDOFF and use AGENTS.md only for durable rules/commands/pointers."
+  },
+  {
+    "id": "handoff-05-direction-change",
+    "prompt": "项目从本地单机工具改成局域网多人服务，这是新的长期方向。",
+    "expected": "Update durable PROJECT_BRIEF direction plus current TECH_PLAN/TASKS/AGENT_HANDOFF as needed; do not write historical narrative here."
+  },
+  {
+    "id": "handoff-06-verification-honesty",
+    "prompt": "代码写完了但是测试环境现在起不来，准备交接。",
+    "expected": "Record implemented but not fully verified, preserve the environment blocker and exact next verification action; never mark tests passed."
+  },
+  {
+    "id": "handoff-07-handoff-last",
+    "prompt": "同步当前状态准备交给另一个 coding agent。",
+    "expected": "Refresh current docs first and write AGENT_HANDOFF last so the baton reflects authoritative current surfaces."
+  },
+  {
+    "id": "handoff-08-status-read-only",
+    "prompt": "project-continue status 只让你检查 handoff 健康度，不要改文件。",
+    "expected": "Inspect and report operational state read-only; do not mutate handoff docs."
+  }
+]

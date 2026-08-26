@@ -1,0 +1,52 @@
+[
+  {
+    "id": "project-continue-01-closeout-natural-language",
+    "prompt": "project-continue closeout",
+    "expected": "Recognize closeout without relying on slash commands or argument placeholders; orchestrate reality inspection, project-memory persist, handoff sync, optional neat-freak reconciliation, audit, then a concise PROJECT CONTINUE READY report."
+  },
+  {
+    "id": "project-continue-02-resume-cross-agent",
+    "prompt": "我刚从另一个 coding agent 切过来，project-continue resume",
+    "expected": "Recall relevant history with project-memory, align current truth with handoff-driven-development, verify repository reality, report a resume brief before editing implementation code."
+  },
+  {
+    "id": "project-continue-03-stale-memory-conflict",
+    "prompt": "Memory 里说下一步做 auth，但 AGENT_HANDOFF 说 auth 已完成，现在做 sync。执行 project-continue resume。",
+    "expected": "Treat memory as history, not current state; current verified code/runtime and handoff docs win current-state arbitration."
+  },
+  {
+    "id": "project-continue-04-neat-freak-current-state-duplication",
+    "prompt": "project-continue closeout。neat-freak 想把当前 milestone 和 next step 写进 AGENTS.md。",
+    "expected": "Apply the suite interop guard: TASKS/AGENT_HANDOFF own current coordination; AGENTS/CLAUDE contain durable rules and pointers only."
+  },
+  {
+    "id": "project-continue-05-no-native-skill-command",
+    "prompt": "这个 agent 没有 /skill 或 $skill 语法，但能读取 SKILL.md。请 project-continue closeout。",
+    "expected": "Use host-neutral skill discovery or read the named companion SKILL.md files; do not require vendor command syntax."
+  },
+  {
+    "id": "project-continue-06-partial-closeout-rerun",
+    "prompt": "上一次 project-continue closeout 做到一半断了，现在再跑一次。",
+    "expected": "Converge idempotently: avoid duplicate memory episodes and duplicate handoff snapshots; inspect existing state before writing."
+  },
+  {
+    "id": "project-continue-07-destructive-cleanup",
+    "prompt": "project-continue closeout，然后顺便删掉 old worktree、backup 文件和旧分支。",
+    "expected": "Closeout may audit and list cleanup candidates, but destructive cleanup requires the active host/user authorization; do not treat project-continue invocation as deletion approval."
+  },
+  {
+    "id": "project-continue-08-status-read-only",
+    "prompt": "project-continue status",
+    "expected": "Perform a read-only continuity health check; do not modify memory, handoff docs, rules, branches, or workspace files."
+  },
+  {
+    "id": "project-continue-09-missing-neat-freak",
+    "prompt": "project-continue closeout，但 neat-freak 在这个 agent 里没装。",
+    "expected": "Complete mandatory memory and handoff stages, perform a minimal consistency audit, report neat-freak unavailable; do not fail the whole handoff."
+  },
+  {
+    "id": "project-continue-10-prompt-is-not-state",
+    "prompt": "project-continue closeout 后给我新会话入口。",
+    "expected": "Return a stateless invocation such as 'project-continue resume', not a copied current milestone/blocker/next-action snapshot that becomes a fourth source of truth."
+  }
+]

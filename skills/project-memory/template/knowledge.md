@@ -1,16 +1,21 @@
-# Project Knowledge
+# Project Historical Knowledge
 
-> Long-lived facts extracted from session memories. Updated incrementally.
+> Distilled historical understanding. This is not the current architecture, task board, or handoff.
 
-## Architecture
-<!-- High-level structure, tech stack, key patterns -->
+## Historical Decisions & Rationale
+<!-- Why important choices were made or later reversed. Link episodes. -->
 
-## Conventions
-<!-- Naming, file layout, testing, commit style -->
+## Architecture / Product Transitions
+<!-- What changed over time and why. Current architecture belongs in current technical docs. -->
 
-## User Preferences
-<!-- Communication style, language, coding style preferences -->
+## Lessons Learned
+<!-- Reusable lessons specific to this project. -->
 
-## Decisions Log
-<!-- Important technical decisions with brief rationale and date -->
-<!-- Format: - **YYYY-MM-DD**: <decision> — <why> -->
+## Pitfalls & Failure Patterns
+<!-- Non-obvious traps, failed approaches, recurring errors, and known fixes. -->
+
+## Environment / Toolchain Quirks
+<!-- Durable machine/runtime/provider/package quirks worth remembering. -->
+
+## Project-Specific Preference History
+<!-- Preferences that explain past choices. Active must-follow rules belong in project rule files. -->

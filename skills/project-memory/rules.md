@@ -1,109 +1,91 @@
-# Memory Management Rules
+# Project Memory v2 — Management Rules
 
-## File Size Limits
-- Each `sessions/*.md` file: **≤ 150 lines**
-- `knowledge.md`: **≤ 300 lines**
-- `context.md`: **≤ 100 lines** (keep it a working snapshot, not a dump)
-- `index.md`: no hard limit, but keep entries to one line each
+## File Responsibilities
 
-## Pruning (when session count > 20)
-1. Read the 5 oldest session files
-2. Extract any lasting knowledge → append to `knowledge.md`
-3. Delete those 5 session files
-4. Remove their entries from `index.md`
-5. Add a note in `index.md`: `<!-- Archived sessions before YYYY-MM-DD into knowledge.md -->`
+| Surface | Responsibility | Lifetime |
+|---|---|---|
+| `.memory/index.md` | Retrieval index for historical episodes | Persistent |
+| `.memory/knowledge.md` | Distilled historical rationale, lessons, pitfalls, transitions | Persistent, curated |
+| `.memory/episodes/` | Evidence-backed development events | Persistent |
+| Handoff docs | Current direction, milestone, slice, blockers, verification, next action | Current/operational |
+| Code/runtime | What actually exists and behaves now | Current reality |
 
-## Merging
-- If two sessions cover the same topic on the same day, merge into one file
-- Keep the later timestamp as the filename
+`.memory/context.md` and `.memory/sessions/` are legacy v1 surfaces only.
 
-## What to Store vs. Skip
+## Size Guidance
+
+- Episode: target **40-120 lines**, max **180 lines**. Split unrelated events.
+- `knowledge.md`: target **<=300 lines**; refactor by topic when it grows beyond 400.
+- `index.md`: one line per episode. Group by month/year when large.
+
+Do not use arbitrary episode-count pruning. **Never automatically delete unique
+historical evidence because the count crossed a threshold.**
+
+## Event-Oriented Persistence
 
 ### STORE
-- User requirements and constraints
-- Files read or modified, and why
-- Technical decisions with rationale
-- Unresolved items and next steps
-- User preferences discovered during conversation
-- User's "try this" suggestions that worked
-- Environment issues and fixes (OS quirks, dependency conflicts)
-- Error patterns and their resolutions
+
+- Decisions and reversals with rationale.
+- Meaningful completed/abandoned slices and their outcome.
+- Failed approaches that are likely to be retried.
+- Non-obvious bug root causes and fixes.
+- Environment/toolchain quirks and reproducible workarounds.
+- User/product choices that materially changed project direction.
+- Important transitions between architectures, dependencies, providers, schemas, or workflows.
+- Verification evidence needed to understand what was true at the time.
 
 ### SKIP
-- Verbatim code (just reference file paths)
-- Trivial exchanges ("hello", "thanks")
-- Intermediate tool output that is already reflected in the outcome
-- Successful tool outputs already reflected in file changes
-- Repetitive "looks good" exchanges
-- Full file diffs (reference the commit or file path instead)
 
-## Vibe Coding Specific Rules
+- Chat transcripts and routine tool calls.
+- "Next step" lists whose only value is current coordination.
+- Current milestone/slice/blocker snapshots.
+- Raw logs already summarized by an outcome.
+- Full source code, diffs, generated output, or copied current docs.
+- Trivial edits obvious from git history.
+- Repetitive confirmations with no new information.
 
-### Context Refresh Cadence
-- Update `context.md` every 3-5 turns during active development
-- Always update `context.md` when switching to a different file or feature
-- On user "break"/"pause"/"later": write a detailed context snapshot immediately
+## Episode Rules
 
-### Context.md Must Contain
-- **Active files**: list of files currently being edited (with line ranges if focused)
-- **Last working state**: key functions/classes/interfaces in flux (names + brief description, not full code)
-- **Pending decisions**: open questions the user hasn't resolved yet
-- **Next steps**: what was about to happen next
-- **Blockers**: anything preventing progress (compilation errors, failing tests, missing info)
+- Use past tense and absolute dates.
+- One episode = one coherent event or transition.
+- Link related episodes instead of merging unrelated history.
+- Cite file paths and commits when available.
+- Separate **observed evidence** from **interpretation/rationale**.
+- "Unresolved at the time" is allowed, but must explicitly say current status lives elsewhere.
+- If a later episode supersedes an earlier decision, keep both and link the transition.
 
-### Error Tracking During Vibe Coding
-When errors occur during iterative development:
-- Record: error message, file:line, what was attempted, what fixed it
-- If fix was user-suggested, note that explicitly (builds preference profile)
-- If fix involved a workaround, note the proper solution for future reference
+## Knowledge Distillation Rules
 
-## Boundary Conditions
+`knowledge.md` is curated, not append-only.
 
-### When NOT to Create a Session File
-- Conversation is purely exploratory (no code changes, no decisions)
-- User is just asking a question (unless it reveals a new preference)
-- Only reading files with no action taken
+Keep:
+- decision rationale that remains useful for understanding history;
+- recurring pitfalls/failure patterns;
+- durable environment quirks;
+- important transitions and why they happened;
+- project-specific preferences that explain prior choices.
 
-### When to Update knowledge.md
-- A new convention or pattern is established
-- A significant architectural decision is made
-- User expresses a preference not previously recorded
-- A toolchain or dependency version changes
-- A recurring workaround is adopted as standard practice
+Do not keep:
+- a current architecture inventory that duplicates `TECH_PLAN.md`;
+- a current task list;
+- a current next step;
+- active operational rules that belong in CLAUDE.md/AGENTS.md/project docs.
 
-### When to Skip Memory Entirely
-- Single-turn trivial tasks ("what does this function do?")
-- Tasks fully captured by git history (no additional context needed)
-- Conversations where user explicitly says "don't record this"
-
-## File Responsibilities and Boundaries
-
-| File | Role | Lifetime | Size Cap |
-|------|------|----------|----------|
-| `.memory/context.md` | Current working snapshot | Volatile — rewrite on each update | ≤ 100 lines |
-| `.memory/knowledge.md` | Long-term durable project knowledge | Persistent — append only | ≤ 300 lines |
-| `.memory/index.md` | Session index with tags | Persistent — append only | No hard limit |
-| `.memory/sessions/` | Chronological session records | Persistent — pruned after 20 | ≤ 150 lines each |
-| `docs/TASKS.md` | Task tree / milestone / acceptance criteria | Managed by handoff-driven-development | N/A |
-| `docs/AGENT_HANDOFF.md` | Agent handoff source of truth | Managed by handoff-driven-development | N/A |
-| `docs/TECH_PLAN.md` | Architecture and module boundaries | Managed by handoff-driven-development | N/A |
-
-### Key Boundaries
-
-- `context.md` is a **snapshot**, not a log. Rewrite it each time — do not append.
-- `context.md` must **not** duplicate content from `docs/TASKS.md` or `docs/AGENT_HANDOFF.md`. Reference them by path only.
-- If the project uses handoff-driven-development docs, `context.md` summarizes the current slice; `TASKS.md` owns the full task tree; `AGENT_HANDOFF.md` owns the handoff details.
-- `knowledge.md` stores facts that survive across sessions. `context.md` stores state that changes within a session.
+When knowledge becomes an active rule/contract, move the authoritative statement to
+the correct current surface and leave only provenance/history in memory.
 
 ## Conflict Handling
-- If `.memory/index.md` is missing but `sessions/` exists, rebuild the index by scanning session files
-- If `.memory/context.md` is missing but other memory files exist, create it from template and populate from recent sessions + project docs
-- If a session filename already exists (same second), append `-2` before `.md`
-- If `context.md` and actual code state diverge, trust the code and update `context.md`
-- If `context.md` and `docs/TASKS.md` or `docs/AGENT_HANDOFF.md` contradict, trust the docs and update `context.md`
-- If two sessions contradict each other, trust the later session and flag the conflict in `knowledge.md`
+
+- **Current-state conflict:** trust verified runtime/code first, then current handoff
+  docs. Memory explains history but does not win current-state arbitration.
+- **Historical conflict:** preserve both if they describe different dates/stages;
+  create a transition episode when needed.
+- **Evidence conflict:** mark uncertainty; do not invent a resolution.
+- **Legacy v1 conflict:** treat `.memory/context.md` as a staleable historical
+  artifact, never as authoritative current state.
 
 ## Privacy
-- Never store API keys, passwords, or secrets in memory files
-- If user shares sensitive info, reference it as "credentials provided" without values
-- Do not store full URLs that contain tokens or session IDs
+
+- Never store API keys, passwords, tokens, cookies, private keys, or credential values.
+- Redact token-bearing URLs and sensitive local paths when unnecessary.
+- Reference "credentials configured" rather than copying secrets.

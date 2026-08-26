@@ -1,0 +1,37 @@
+[
+  {
+    "id": "memory-01-recall-rationale",
+    "prompt": "为什么项目之前从 SQLite 改成 PostgreSQL？",
+    "expected": "Recall relevant historical episodes/rationale without pretending the old architecture is current."
+  },
+  {
+    "id": "memory-02-no-trivial-episode",
+    "prompt": "我只改了一个按钮 margin，帮我 persist memory。",
+    "expected": "Normally skip a new episode because the edit has no meaningful historical value."
+  },
+  {
+    "id": "memory-03-failed-approach",
+    "prompt": "这个诡异 bug 最后定位到 Windows 路径大小写，之前两种方案都失败了。记录下来。",
+    "expected": "Persist one evidence-backed episode with attempts, outcome, and reusable pitfall; update index/knowledge if warranted."
+  },
+  {
+    "id": "memory-04-stale-next-action",
+    "prompt": "一个旧 episode 说当时下一步做 auth。现在下一步是什么？",
+    "expected": "Explain that historical unresolved-at-the-time items are not current next actions and route current-state lookup to handoff/code."
+  },
+  {
+    "id": "memory-05-legacy-store",
+    "prompt": "项目还有旧的 .memory/context.md 和 sessions/，但新的 AGENT_HANDOFF 说当前工作已经完全不同。",
+    "expected": "Treat legacy memory as historical migration input only; never refresh context.md or use it as current truth."
+  },
+  {
+    "id": "memory-06-project-continue-resume",
+    "prompt": "project-continue resume 调用 project-memory，请只恢复当前工作相关的历史。",
+    "expected": "Read index/knowledge then only a few relevant episodes; return historical decisions/attempts/pitfalls to Project Continue without current-state claims."
+  },
+  {
+    "id": "memory-07-project-continue-closeout",
+    "prompt": "project-continue closeout 调用 project-memory；本轮解决了一个以后很可能重复踩的部署坑。",
+    "expected": "Persist the meaningful episode and reusable lesson, then return control to Project Continue; do not write blocker/milestone/next action."
+  }
+]
